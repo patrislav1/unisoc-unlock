@@ -23,6 +23,10 @@ adb reboot bootloader
 python3 unisoc-unlock.py
 ```
 
+* Confirm unlocking on the device
+
+  Note: on the RG405M, the text on the device screen will ask for 'volume down' button to confirm unlock,
+  but the home/back button has to be pressed instead!
 
 ## References
 
