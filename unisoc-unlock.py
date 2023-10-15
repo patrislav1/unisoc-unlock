@@ -8,10 +8,10 @@ from Cryptodome.PublicKey import RSA
 import base64
 import io
 
-def info_cb(s):
-    print(f'info_cb: {s}')
 
 class OemIdToken:
+    # Callback object for fastboot 'get_identifier_token' command
+
     def __init__(self):
         self.n = 0
         self.id = None
@@ -29,6 +29,7 @@ def sign_token(tok, key_file):
     h = SHA256.new(tok)
     signature = PKCS1_v1_5.new(priv_key).sign(h)
     return signature
+
 
 def main():
     try:
@@ -53,10 +54,13 @@ def main():
     id_raw = base64.b16decode(id, casefold=True)
     sgn = sign_token(id_raw, 'rsa4096_vbmeta.pem')
 
-#    download_header = f'download:{len(sgn):08x}'
-    a = dev.Download(io.BytesIO(sgn), source_len=len(sgn))
-    print(a)
+    print('Download signature')
+    dev.Download(io.BytesIO(sgn), source_len=len(sgn))
 
+    print('Unlock bootloader, pls follow instructions on device screen')
+    dev._SimpleCommand(b'flashing unlock_bootloader', timeout_ms=60*1000)
+
+    print('Bootloader unlocked.')
     dev.Close()
 
 
