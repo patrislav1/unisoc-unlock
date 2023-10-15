@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
 import sys
-from adb import fastboot, usb_exceptions
+from bundled_adb import fastboot, usb_exceptions
 from Cryptodome.Signature import PKCS1_v1_5
 from Cryptodome.Hash import SHA256
 from Cryptodome.PublicKey import RSA
 import base64
+import io
 
 def info_cb(s):
     print(f'info_cb: {s}')
@@ -44,19 +45,21 @@ def main():
     try:
         dev.Oem('get_identifier_token', info_cb=oem_id)
     except Exception as e:
-        print(f'Fastboot error {str(e)}')
+        print(f'Fastboot error: {str(e)}')
         sys.exit(1)
 
+    print(f'OEM ID: {oem_id.id}')
     id = oem_id.id.ljust(2*64, '0')
-    print(id)
+    id_raw = base64.b16decode(id, casefold=True)
+    sgn = sign_token(id_raw, 'rsa4096_vbmeta.pem')
+
+#    download_header = f'download:{len(sgn):08x}'
+    a = dev.Download(io.BytesIO(sgn), source_len=len(sgn))
+    print(a)
+
     dev.Close()
 
 
 if __name__ == '__main__':
-    oem_id = '52473430354d3032333736373036' 
-    id = oem_id.ljust(2*64, '0')
-    id_raw = base64.b16decode(id, casefold=True)
-    # print(id_raw)
-    sgn = sign_token(id_raw, 'rsa4096_vbmeta.pem')
-    open('sig.bin', 'wb').write(sgn)
+    main()
 
