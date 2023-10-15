@@ -9,7 +9,7 @@ There is also a custom fastboot binary in circulation [2] which implements a cus
 ## python-adb
 
 `unisoc-unlock` is implemented with python-adb [3]. Since python-adb is abandoned and
-required some tweaking to work with the Unisoc, it is not referenced as dependency but bundled instead.
+requires some tweaking to work with the Unisoc, it is not referenced as dependency, but bundled instead.
 
 ## Usage
 
@@ -27,5 +27,7 @@ python3 unisoc-unlock.py
 ## References
 
 [1] https://github.com/turtleletortue/turtleletortue.github.io
+
 [2] https://www.hovatek.com/forum/thread-32287.html
+
 [3] https://github.com/google/python-adb
