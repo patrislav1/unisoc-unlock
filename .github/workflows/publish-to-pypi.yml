@@ -1,0 +1,24 @@
+name: "Publish Python distribution to PyPI"
+on: [push]
+
+jobs:
+  build-and-publish:
+    name: "Publish Python distribution to PyPI"
+    runs-on: ubuntu-22.04
+    
+    steps:
+    - uses: actions/checkout@main
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+      
+    - name: "Build Python package"
+      run: |
+        python3 -m pip install --user --upgrade build
+        python3 -m build
+
+    - name: Publish distribution to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1.8
+      with:
+        password: ${{ secrets.pypi_password }}
