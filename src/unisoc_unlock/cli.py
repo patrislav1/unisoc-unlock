@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
+import os
 import sys
-from bundled_adb import fastboot, usb_exceptions
+from .bundled_adb import fastboot, usb_exceptions
 from Crypto.Signature import PKCS1_v1_5
 from Crypto.Hash import SHA256
 from Crypto.PublicKey import RSA
@@ -52,7 +53,11 @@ def main():
     print(f'OEM ID: {oem_id.id}')
     id = oem_id.id.ljust(2*64, '0')
     id_raw = base64.b16decode(id, casefold=True)
-    sgn = sign_token(id_raw, 'rsa4096_vbmeta.pem')
+    pemfile = os.path.join(
+        os.path.dirname(__file__),
+        'rsa4096_vbmeta.pem'
+    )
+    sgn = sign_token(id_raw, pemfile)
 
     print('Download signature')
     dev.Download(io.BytesIO(sgn), source_len=len(sgn))

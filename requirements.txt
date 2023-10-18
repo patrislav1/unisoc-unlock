@@ -1,3 +1,0 @@
-libusb1
-pycryptodome
-

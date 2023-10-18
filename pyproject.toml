@@ -1,0 +1,24 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "unisoc_unlock"
+version = "0.0.1"
+authors = [
+  { name="Patrick Huesmann", email="info@patrick-huesmann.de" },
+]
+description = "Tool for unlocking a Unisoc/Spreadtrum Android bootloader"
+readme = "README.md"
+requires-python = ">=3.6"
+dependencies = [
+  "libusb1",
+  "pycryptodome"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/pypa/sampleproject"
+
+[project.scripts]
+unisoc_unlock = "unisoc_unlock.cli:main"
+
