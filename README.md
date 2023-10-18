@@ -11,6 +11,13 @@ There is also a custom fastboot binary in circulation [2] which implements a cus
 `unisoc-unlock` is implemented with python-adb [3]. Since python-adb is abandoned and
 requires some tweaking to work with the Unisoc, it is not referenced as dependency, but bundled instead.
 
+## Installation
+
+Install with pip:
+```bash
+pip3 install unisoc-unlock
+```
+
 ## Usage
 
 * Reboot device into fastboot mode
@@ -20,7 +27,7 @@ adb reboot bootloader
 
 * Run the python script
 ```
-python3 unisoc-unlock.py
+python3 -m unisoc_unlock
 ```
 
 * Confirm unlocking on the device
