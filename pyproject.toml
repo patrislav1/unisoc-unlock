@@ -17,7 +17,7 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/pypa/sampleproject"
+"Homepage" = "https://github.com/patrislav1/unisoc-unlock"
 
 [project.scripts]
 unisoc_unlock = "unisoc_unlock.cli:main"
