@@ -2,9 +2,9 @@
 
 import sys
 from bundled_adb import fastboot, usb_exceptions
-from Cryptodome.Signature import PKCS1_v1_5
-from Cryptodome.Hash import SHA256
-from Cryptodome.PublicKey import RSA
+from Crypto.Signature import PKCS1_v1_5
+from Crypto.Hash import SHA256
+from Crypto.PublicKey import RSA
 import base64
 import io
 
@@ -66,4 +66,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
