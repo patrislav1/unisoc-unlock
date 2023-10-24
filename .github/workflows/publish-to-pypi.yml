@@ -1,6 +1,9 @@
 name: "Publish Python distribution to PyPI"
-on: [push]
 
+on:
+  push:
+    tags:
+      - v*
 jobs:
   build-and-publish:
     name: "Publish Python distribution to PyPI"
