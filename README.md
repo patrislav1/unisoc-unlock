@@ -2,7 +2,7 @@
 
 This is a tool to lock/unlock a Unisoc / Spreadtrum (SPD) Android bootloader using its Identifier Token.
 
-It is a port of a WebUSB based tool [1] to Python. The WebUSB based tool does not work on Linux for some reason.
+It is a port of a WebUSB based tool ([0], original [1]) to Python. The WebUSB based tool does not work on Linux for some reason.
 There is also a custom fastboot binary in circulation [2] which implements a custom command for unlocking the bootloader.
 `unisoc-unlock` implements the same functionality, but without resorting to a custom fastboot binary. Since it is a pure Python solution it should be able to run on any platform running Python.
 
@@ -53,7 +53,9 @@ python3 -m unisoc_unlock lock    # To re-lock the bootloader
 
 ## References
 
-[1] https://github.com/turtleletortue/turtleletortue.github.io
+[0] https://github.com/turtleletortue/turtleletortue.github.io
+
+[1] https://github.com/unisoc-android/unisoc-android.github.io
 
 [2] https://www.hovatek.com/forum/thread-32287.html
 
