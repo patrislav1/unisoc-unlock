@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import re
 import sys
 from .bundled_adb import fastboot, usb_exceptions
 from Crypto.Signature import PKCS1_v1_5
@@ -13,16 +14,44 @@ import importlib.metadata
 
 
 class OemIdToken:
-    # Callback object for fastboot 'get_identifier_token' command
+    """Callback object for fastboot 'get_identifier_token' command.
+    
+    UNISOC/Spreadtrum devices send the identifier token in a non-standard
+    format. Instead of a standard INFO packet, they send a packet whose
+    first 2 bytes are 'SN', followed immediately by the hex token.
+    
+    Example raw packet from device:
+        b'SN00000000000000000000000000\\n\\x00...'
+    
+    The patched fastboot.py strips 'SN' prefix and passes the remainder
+    as a FastbootMessage with header=b'SN'.
+    """
 
     def __init__(self):
         self.n = 0
         self.id = None
 
-    # Gets passed a FastbootMessage object
     def __call__(self, fb_msg):
-        if self.n == 1 and self.id == None and fb_msg.header == b'INFO':
-            self.id = fb_msg.message.decode('utf-8').strip()
+        msg_bytes = fb_msg.message
+        header = fb_msg.header
+
+        if header == b'SN':
+            # UNISOC format: message is the hex token bytes directly
+            # e.g. b'00000000000000000000000000'
+            candidate = msg_bytes.decode('utf-8', errors='replace').strip()
+            if re.fullmatch(r'[0-9a-fA-F]+', candidate):
+                self.id = candidate
+                print(f'[DEBUG] Token extracted (SN format): {self.id}')
+
+        elif header == b'INFO':
+            # Standard fastboot INFO format
+            msg = msg_bytes.decode('utf-8', errors='replace').strip()
+            # Some devices send hex token as second INFO packet
+            if self.id is None:
+                hex_match = re.search(r'([0-9a-fA-F]{16,})', msg)
+                if hex_match:
+                    self.id = hex_match.group(1)
+                    print(f'[DEBUG] Token extracted (INFO format): {self.id}')
 
         self.n += 1
 
@@ -52,9 +81,13 @@ class BootloaderCmd:
             print(f'Fastboot error: {str(e)}')
             sys.exit(1)
 
+        if oem_id.id is None:
+            print('ERROR: Could not extract identifier token from device response.', file=sys.stderr)
+            sys.exit(1)
+
         print(f'OEM ID: {oem_id.id}')
-        id = oem_id.id.ljust(2*64, '0')
-        id_raw = base64.b16decode(id, casefold=True)
+        id_padded = oem_id.id.ljust(2 * 64, '0')
+        id_raw = base64.b16decode(id_padded, casefold=True)
         pemfile = os.path.join(
             os.path.dirname(__file__),
             'rsa4096_vbmeta.pem'
@@ -72,7 +105,7 @@ class BootloaderUnlock(BootloaderCmd):
 
         print('Unlock bootloader, pls follow instructions on device screen')
         self.dev._SimpleCommand(
-            b'flashing unlock_bootloader', timeout_ms=60*1000)
+            b'flashing unlock_bootloader', timeout_ms=60 * 1000)
 
         print('Bootloader unlocked.')
         self.dev.Close()
@@ -85,7 +118,7 @@ class BootloaderLock(BootloaderCmd):
 
         print('Lock bootloader, pls follow instructions on device screen')
         self.dev._SimpleCommand(
-            b'flashing lock_bootloader', timeout_ms=60*1000)
+            b'flashing lock_bootloader', timeout_ms=60 * 1000)
 
         print('Bootloader locked.')
         self.dev.Close()
